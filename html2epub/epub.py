@@ -133,7 +133,8 @@ class TocNcx(_EpubFile):
         super(TocNcx, self).add_chapters(**{'id': id_list,
                                             'play_order': play_order_list,
                                             'title': title_list,
-                                            'link': link_list})
+                                            'link': link_list
+                                            })
 
     def get_content_as_element(self):
         if lxml_module_exists:
@@ -158,8 +159,9 @@ class ContentOpf(_EpubFile):
     def add_chapters(self, chapter_list):
         id_list = range(len(chapter_list))
         link_list = [str(n) + '.xhtml' for n in id_list]
+        imgs_list = [c.imgs for c in chapter_list]
         super(ContentOpf, self).add_chapters(
-            **{'id': id_list, 'link': link_list})
+            **{'id': id_list, 'link': link_list, "imgs": imgs_list})
 
     def get_content_as_element(self):
         if lxml_module_exists:
