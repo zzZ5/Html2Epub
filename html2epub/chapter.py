@@ -308,6 +308,7 @@ class ChapterFactory(object):
         """
         clean_html_string = self.clean_function(html_string)
         clean_xhtml_string = clean.html_to_xhtml(clean_html_string)
+
         if title:
             pass
         else:
