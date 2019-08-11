@@ -14,6 +14,9 @@
     <item href="toc.html" id="toc" media-type="application/xhtml+xml"/>
     {% for chapter in chapters %}
     <item href="{{ chapter.link }}" id="{{ chapter.id }}" media-type="application/xhtml+xml"/>
+      {% for img in chapter.imgs %}
+      <item href="{{ img.link }}" id="{{ img.id }}" media-type="image/{{ img.type }}"/>
+      {% endfor %}
     {% endfor %}
   </manifest>
   <spine toc="ncx">
