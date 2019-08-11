@@ -1,5 +1,7 @@
-<!DOCTYPE html>
-<html>
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
 
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
@@ -8,7 +10,9 @@
 
 <body>
   <h2>目录</h2>
-  <hr>
+  <hr class="line-index" />
+  <!--分隔线-->
+  <!--目录索引，根据需要填写章节名，并修改要链接到文件名-->
   <div id="chapters">
     {% for chapter in chapters %}
     <p><a href="{{ chapter.link }}">{{ chapter.title }}</a></p>
