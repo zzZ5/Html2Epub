@@ -165,7 +165,7 @@ class Chapter(object):
             assert file_name[-6:] == '.xhtml'
         except (AssertionError, IndexError):
             raise ValueError('filename must end with .xhtml')
-        with open(file_name, 'wb', encoding='utf-8') as f:
+        with open(file_name, 'w', encoding='utf-8') as f:
             f.write(self.content)
 
     def _validate_input_types(self, content, title):
@@ -206,8 +206,7 @@ class Chapter(object):
         image_url_list = self._get_image_urls()
         for image_tag, image_url in image_url_list:
             _replace_image(image_url, image_tag, ebook_folder)
-        unformatted_html_unicode_string = self._content_tree.prettify(encoding='utf-8',
-                                                                      formatter=EntitySubstitution.substitute_html)
+        unformatted_html_unicode_string = self._content_tree.prettify()
         unformatted_html_unicode_string = unformatted_html_unicode_string.replace(
             '<br>', '<br/>')
         self.content = unformatted_html_unicode_string
