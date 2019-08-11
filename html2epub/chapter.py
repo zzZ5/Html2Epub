@@ -1,3 +1,7 @@
+#!usr/bin/python3
+# -*- coding: utf-8 -*-
+
+# import from python standard library
 import cgi
 import codecs
 import imghdr
@@ -5,14 +9,16 @@ import os
 import shutil
 import tempfile
 import urllib
-import urlparse
+from urllib.parse import urljoin
 import uuid
 
+# import from other modules
+import requests
 import bs4
 from bs4 import BeautifulSoup
 from bs4.dammit import EntitySubstitution
-import requests
 
+# import from local modules
 import clean
 
 
@@ -35,8 +41,8 @@ def get_image_type(url):
             return ending
     else:
         try:
-            f, temp_file_name = tempfile.mkstemp()
-            urllib.urlretrieve(url, temp_file_name)
+            _, temp_file_name = tempfile.mkstemp()
+            urllib.request.urlretrieve(url, temp_file_name)
             image_type = imghdr.what(temp_file_name)
             return image_type
         except IOError:
@@ -59,7 +65,8 @@ def save_image(image_url, image_directory, image_name):
     image_type = get_image_type(image_url)
     if image_type is None:
         raise ImageErrorException(image_url)
-    full_image_file_name = os.path.join(image_directory, image_name + '.' + image_type)
+    full_image_file_name = os.path.join(
+        image_directory, image_name + '.' + image_type)
 
     # If the image is present on the local filesystem just copy it
     if os.path.exists(image_url):
@@ -111,7 +118,8 @@ def _replace_image(image_url, image_tag, ebook_folder,
     except ImageErrorException:
         image_tag.decompose()
     except AssertionError:
-        raise ValueError('%s doesn\'t exist or doesn\'t contain a subdirectory images' % ebook_folder)
+        raise ValueError(
+            '%s doesn\'t exist or doesn\'t contain a subdirectory images' % ebook_folder)
     except TypeError:
         image_tag.decompose()
 
@@ -137,6 +145,7 @@ class Chapter(object):
         html_title (str): Title string with special characters replaced with
             html-safe sequences
     """
+
     def __init__(self, content, title, url=None):
         self._validate_input_types(content, title)
         self.title = title
@@ -156,16 +165,16 @@ class Chapter(object):
             assert file_name[-6:] == '.xhtml'
         except (AssertionError, IndexError):
             raise ValueError('filename must end with .xhtml')
-        with open(file_name, 'wb') as f:
-            f.write(self.content.encode('utf-8'))
+        with open(file_name, 'wb', encoding='utf-8') as f:
+            f.write(self.content)
 
     def _validate_input_types(self, content, title):
         try:
-            assert isinstance(content, basestring)
+            assert isinstance(content, str)
         except AssertionError:
             raise TypeError('content must be a string')
         try:
-            assert isinstance(title, basestring)
+            assert isinstance(title, str)
         except AssertionError:
             raise TypeError('title must be a string')
         try:
@@ -185,19 +194,22 @@ class Chapter(object):
 
     def _get_image_urls(self):
         image_nodes = self._content_tree.find_all('img')
-        raw_image_urls = [node['src'] for node in image_nodes if node.has_attr('src')]
-        full_image_urls = [urlparse.urljoin(self.url, image_url) for image_url in raw_image_urls]
-        image_nodes_filtered = [node for node in image_nodes if node.has_attr('src')]
+        raw_image_urls = [node['src']
+                          for node in image_nodes if node.has_attr('src')]
+        full_image_urls = [urljoin(
+            self.url, image_url) for image_url in raw_image_urls]
+        image_nodes_filtered = [
+            node for node in image_nodes if node.has_attr('src')]
         return zip(image_nodes_filtered, full_image_urls)
 
     def _replace_images_in_chapter(self, ebook_folder):
         image_url_list = self._get_image_urls()
         for image_tag, image_url in image_url_list:
             _replace_image(image_url, image_tag, ebook_folder)
-        unformatted_html_unicode_string = unicode(self._content_tree.prettify(encoding='utf-8',
-                                                                              formatter=EntitySubstitution.substitute_html),
-                                                  encoding='utf-8')
-        unformatted_html_unicode_string = unformatted_html_unicode_string.replace('<br>', '<br/>')
+        unformatted_html_unicode_string = self._content_tree.prettify(encoding='utf-8',
+                                                                      formatter=EntitySubstitution.substitute_html)
+        unformatted_html_unicode_string = unformatted_html_unicode_string.replace(
+            '<br>', '<br/>')
         self.content = unformatted_html_unicode_string
 
 
@@ -239,12 +251,14 @@ class ChapterFactory(object):
             ValueError: Raised if unable to connect to url supplied
         """
         try:
-            request_object = requests.get(url, headers=self.request_headers, allow_redirects=False)
-        except (requests.exceptions.MissingSchema,
-                requests.exceptions.ConnectionError):
-            raise ValueError("%s is an invalid url or no network connection" % url)
+            request_object = requests.get(
+                url, headers=self.request_headers, allow_redirects=False)
         except requests.exceptions.SSLError:
             raise ValueError("Url %s doesn't have valid SSL certificate" % url)
+        except (requests.exceptions.MissingSchema,
+                requests.exceptions.ConnectionError):
+            raise ValueError(
+                "%s is an invalid url or no network connection" % url)
         unicode_string = request_object.text
         return self.create_chapter_from_string(unicode_string, url, title)
 
@@ -297,12 +311,13 @@ class ChapterFactory(object):
                 root = BeautifulSoup(html_string, 'html.parser')
                 title_node = root.title
                 if title_node is not None:
-                    title = unicode(title_node.string)
+                    title = title_node.string
                 else:
                     raise ValueError
             except (IndexError, ValueError):
                 title = 'Ebook Chapter'
         return Chapter(clean_xhtml_string, title, url)
+
 
 create_chapter_from_url = ChapterFactory().create_chapter_from_url
 create_chapter_from_file = ChapterFactory().create_chapter_from_file
