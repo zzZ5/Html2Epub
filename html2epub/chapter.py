@@ -114,8 +114,9 @@ def _replace_image(image_url, image_tag, ebook_folder,
         assert os.path.exists(image_full_path)
         image_extension = save_image(image_url, image_full_path,
                                      image_name)
-        image_tag['src'] = 'images' + '/' + image_name + '.' + image_extension
-        return image_tag['src'], image_name, image_extension
+        image_link = 'images' + '/' + image_name + '.' + image_extension
+        image_tag['src'] = image_link 
+        return image_link, image_name, image_extension
     except ImageErrorException:
         image_tag.decompose()
     except AssertionError:
