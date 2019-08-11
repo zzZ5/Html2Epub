@@ -80,7 +80,7 @@ def clean(input_string,
                 parent_node.append(n)
         else:
             attribute_dict = current_node.attrs
-            for attribute in attribute_dict.keys():
+            for attribute in list(attribute_dict.keys()):
                 if attribute not in tag_dictionary[current_node.name]:
                     attribute_dict.pop(attribute)
         stack.extend(child_node_list)
@@ -92,8 +92,7 @@ def clean(input_string,
     for node in image_node_list:
         if not node.has_attr('src'):
             node.extract()
-    unformatted_html_unicode_string = root.prettify(encoding='utf-8',
-                                                    formatter=EntitySubstitution.substitute_html)
+    unformatted_html_unicode_string = root.prettify()
     # fix <br> tags since not handled well by default by bs4
     unformatted_html_unicode_string = unformatted_html_unicode_string.replace(
         '<br>', '<br/>')
@@ -152,8 +151,7 @@ def html_to_xhtml(html_unicode_string):
                                   'string is the following: %s', root]))
     # Add xmlns attribute to html node
     root.html['xmlns'] = 'http://www.w3.org/1999/xhtml'
-    unicode_string = root.prettify(
-        encoding='utf-8', formatter='html')
+    unicode_string = root.prettify()
     # Close singleton tag_dictionary
     for tag in constants.SINGLETON_TAG_LIST:
         unicode_string = unicode_string.replace(
