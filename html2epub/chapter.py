@@ -115,6 +115,7 @@ def _replace_image(image_url, image_tag, ebook_folder,
         image_extension = save_image(image_url, image_full_path,
                                      image_name)
         image_tag['src'] = 'images' + '/' + image_name + '.' + image_extension
+        return image_tag['src'], image_name, image_extension
     except ImageErrorException:
         image_tag.decompose()
     except AssertionError:
@@ -153,6 +154,7 @@ class Chapter(object):
         self._content_tree = BeautifulSoup(self.content, 'html.parser')
         self.url = url
         self.html_title = cgi.escape(self.title, quote=True)
+        self.imgs = []
 
     def write(self, file_name):
         """
@@ -205,7 +207,9 @@ class Chapter(object):
     def _replace_images_in_chapter(self, ebook_folder):
         image_url_list = self._get_image_urls()
         for image_tag, image_url in image_url_list:
-            _replace_image(image_url, image_tag, ebook_folder)
+            img_link, img_id, img_type = _replace_image(image_url, image_tag, ebook_folder)
+            img = {'link': img_link, 'id': img_id, 'type':img_type}
+            self.imgs.append(img)
         unformatted_html_unicode_string = self._content_tree.prettify()
         unformatted_html_unicode_string = unformatted_html_unicode_string.replace(
             '<br>', '<br/>')
