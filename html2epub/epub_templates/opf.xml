@@ -23,6 +23,6 @@
     {% endfor %}
   </spine>
   <guide>
-    <reference type="toc" title="Table of Contents" href="toc.html"/>
+    <reference type="toc" title="目录" href="toc.html"/>
   </guide>
 </package>
