@@ -74,12 +74,15 @@ def saveEpub(url):
         chapter = create_chapter_from_string(
             eachHtml, title="章节" + str(i))
         epub.add_chapter(chapter)
-        print("已整合{}%".format((htmls.index(eachHtml) + 1) / len(htmls) * 100))
+        print("已整合{.2f}%".format(
+            (htmls.index(eachHtml) + 1) / len(htmls) * 100))
     epub.create_epub(DIR)
     print("整合完毕.")
 
 
 if __name__ == "__main__":    # 主函数
-    URL = input("请输入要下载的网址: ")    # 获取地址
-    print("url为: " + URL + "\n开始下载...")
+    # URL = input("请输入要下载的网址: ")    # 获取地址
+    # print("url为: " + URL + "\n开始下载...")
+    URL = "https://www.lightnovel.cn/forum.php?mod=viewthread&tid=989498&page=1&authorid=1078151"
+
     saveEpub(URL)
