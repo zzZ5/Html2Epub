@@ -1,7 +1,7 @@
 #!usr/bin/python3
 # -*- coding: utf-8 -*-
 
-# import from python standard library
+# Included modules
 import cgi
 import codecs
 import imghdr
@@ -12,14 +12,13 @@ import urllib
 from urllib.parse import urljoin
 import uuid
 
-# import from other modules
+# Third party modules
 import requests
 import bs4
 from bs4 import BeautifulSoup
-from bs4.dammit import EntitySubstitution
 
-# import from local modules
-import clean
+# Local modules
+from . import clean
 
 
 class NoUrlError(Exception):
@@ -36,7 +35,20 @@ class ImageErrorException(Exception):
 
 
 def get_image_type(url):
-    for ending in ['jpg', 'jpeg', '.gif' '.png']:
+    """
+    获取图片的类型.
+
+    Parameters:
+        url(str): 图片路径.
+
+    returns:
+        str: 图片的类型名{'jpg', 'jpge', 'gif', 'png', None}
+
+    raises:
+        IOError: 图片类型不在 {'jpg', 'jpge', 'gif', 'png'} 四个类型之中
+    """
+
+    for ending in ['jpg', 'jpeg', 'gif' 'png']:
         if url.endswith(ending):
             return ending
     else:
@@ -51,16 +63,18 @@ def get_image_type(url):
 
 def save_image(image_url, image_directory, image_name):
     """
-    Saves an online image from image_url to image_directory with the name image_name.
-    Returns the extension of the image saved, which is determined dynamically.
+    保存在线图片到指定的路径, 可自定义文件名.
 
-    Args:
-        image_url (str): The url of the image.
-        image_directory (str): The directory to save the image in.
-        image_name (str): The file name to save the image as.
+    Parameters:
+        image_url (str): image路径.
+        image_directory (str): 保存image的路径.
+        image_name (str): image的文件名(无后缀).
 
     Raises:
-        ImageErrorException: Raised if unable to save the image at image_url
+        ImageErrorException: 在无法保存该图片时触发该 Error.
+
+    Returns:
+        str: 图片的类型.
     """
     image_type = get_image_type(image_url)
     if image_type is None:
@@ -76,7 +90,7 @@ def save_image(image_url, image_directory, image_name):
     try:
         # urllib.urlretrieve(image_url, full_image_file_name)
         with open(full_image_file_name, 'wb') as f:
-            user_agent = r'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:31.0) Gecko/20100101 Firefox/31.0'
+            user_agent = r'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.100 Safari/537.36'
             request_headers = {'User-Agent': user_agent}
             requests_object = requests.get(image_url, headers=request_headers)
             try:
@@ -93,15 +107,18 @@ def save_image(image_url, image_directory, image_name):
 def _replace_image(image_url, image_tag, ebook_folder,
                    image_name=None):
     """
-    Replaces the src of an image to link to the local copy in the images folder of the ebook. Tightly coupled with bs4
-        package.
+    将 image_tag 中的image下载到本地, 并将 image_tag 中img的src修改为本地src.
 
-    Args:
-        image_url (str): The url of the image.
-        image_tag (bs4.element.Tag): The bs4 tag containing the image.
-        ebook_folder (str): The directory where the ebook files are being saved. This must contain a subdirectory
-            called "images".
-        image_name (Option[str]): The short name to save the image as. Should not contain a directory or an extension.
+    Parameters:
+        image_url (str): image的url.
+        image_tag (bs4.element.Tag): bs4中包含image的tag.
+        ebook_folder (str): 将外部图片保存到本地的地址. 内部一定要包含一个名为 "images" 的文件夹.
+        image_name (Option[str]): 保存到本地的imgae的文件名(不包含后缀).
+
+    Returns:
+        str: image本地链接地址
+        str: image的文件名(不包含后缀)
+        str: image的类型 {'jpg', 'jpge', 'gif', 'png'} .
     """
     try:
         assert isinstance(image_tag, bs4.element.Tag)
@@ -115,7 +132,7 @@ def _replace_image(image_url, image_tag, ebook_folder,
         image_extension = save_image(image_url, image_full_path,
                                      image_name)
         image_link = 'images' + '/' + image_name + '.' + image_extension
-        image_tag['src'] = image_link 
+        image_tag['src'] = image_link
         return image_link, image_name, image_extension
     except ImageErrorException:
         image_tag.decompose()
@@ -126,26 +143,20 @@ def _replace_image(image_url, image_tag, ebook_folder,
         image_tag.decompose()
 
 
-class Chapter(object):
+class Chapter():
     """
-    Class representing an ebook chapter. By and large this shouldn't be
-    called directly but rather one should use the class ChapterFactor to
-    instantiate a chapter.
+    chapter对象类. 不能直接调用, 应该用 ChapterFactor() 去实例化chapter.
 
-    Args:
-        content (str): The content of the chapter. Should be formatted as
-            xhtml.
-        title (str): The title of the chapter.
-        url (Option[str]): The url of the webpage where the chapter is from if
-            applicable. By default this is None.
+    Parameters:
+        content (str): 章节内容. 必须为xhtml格式.
+        title (str): 章节标题.
+        url (Option[str]): 章节所在网页的URL(如果适用), 默认情况下为None.
 
     Attributes:
-        content (str): The content of the ebook chapter.
-        title (str): The title of the chapter.
-        url (str): The url of the webpage where the chapter is from if
-            applicable.
-        html_title (str): Title string with special characters replaced with
-            html-safe sequences
+        content (str): 章节内容.
+        title (str): 章节标题.
+        url (str): 章节所在网页的URL(如果适用).
+        html_title (str): 将特殊字符替换为html安全序列的标题字符串.
     """
 
     def __init__(self, content, title, url=None):
@@ -159,10 +170,10 @@ class Chapter(object):
 
     def write(self, file_name):
         """
-        Writes the chapter object to an xhtml file.
+        将chapter内容写入 xhtml文件.
 
-        Args:
-            file_name (str): The full name of the xhtml file to save to.
+        Parameters:
+            file_name (str): 要写入xhtml文件的全名(包含后缀).
         """
         try:
             assert file_name[-6:] == '.xhtml'
@@ -208,8 +219,9 @@ class Chapter(object):
     def _replace_images_in_chapter(self, ebook_folder):
         image_url_list = self._get_image_urls()
         for image_tag, image_url in image_url_list:
-            img_link, img_id, img_type = _replace_image(image_url, image_tag, ebook_folder)
-            img = {'link': img_link, 'id': img_id, 'type':img_type}
+            img_link, img_id, img_type = _replace_image(
+                image_url, image_tag, ebook_folder)
+            img = {'link': img_link, 'id': img_id, 'type': img_type}
             self.imgs.append(img)
         unformatted_html_unicode_string = self._content_tree.prettify()
         unformatted_html_unicode_string = unformatted_html_unicode_string.replace(
@@ -217,15 +229,12 @@ class Chapter(object):
         self.content = unformatted_html_unicode_string
 
 
-class ChapterFactory(object):
+class ChapterFactory():
     """
-    Used to create Chapter objects.Chapter objects can be created from urls,
-    files, and strings.
+    用来创建 chapter的类. 可以从 url, 文件 或 文本 三个方式创建 chapter.
 
-    Args:
-        clean_function (Option[function]): A function used to sanitize raw
-            html to be used in an epub. By default, this is the pypub.clean
-            function.
+    Parameters:
+        clean_function (Option[function]): 用于清扫要在epub中使用的原始html 的函数. 默认情况下, 这是html2epub.clean函数.
     """
 
     def __init__(self, clean_function=clean.clean):
@@ -235,24 +244,19 @@ class ChapterFactory(object):
 
     def create_chapter_from_url(self, url, title=None):
         """
-        Creates a Chapter object from a url. Pulls the webpage from the
-        given url, sanitizes it using the clean_function method, and saves
-        it as the content of the created chapter. Basic webpage loaded
-        before any javascript executed.
+        从URL创建chapter对象. 
+        从给定的url中提取网页, 使用clean_function方法对其进行清理, 并将其另存为创建的chpter的内容.
+        在执行任何javascript之前加载的基本网页.
 
-        Args:
-            url (string): The url to pull the content of the created Chapter
-                from
-            title (Option[string]): The title of the created Chapter. By
-                default, this is None, in which case the title will try to be
-                inferred from the webpage at the url.
+        Parameters:
+            url (string): 获取chapter对象的网页地址.
+            title (Option[string]): chapter的章节名, 如果为None, 则使用从网页中获取的 title标签 的内容作为章节名.
 
         Returns:
-            Chapter: A chapter object whose content is the webpage at the given
-                url and whose title is that provided or inferred from the url
+            Chapter: 一个Chapter对象, 其内容是给定url的网页. 
 
         Raises:
-            ValueError: Raised if unable to connect to url supplied
+            ValueError: 如果无法连接该url则触发此 Error.
         """
         try:
             request_object = requests.get(
@@ -268,21 +272,16 @@ class ChapterFactory(object):
 
     def create_chapter_from_file(self, file_name, url=None, title=None):
         """
-        Creates a Chapter object from an html or xhtml file. Sanitizes the
-        file's content using the clean_function method, and saves
-        it as the content of the created chapter.
+        从html或xhtml文件创建chapter对象.
+        使用clean_function方法清理文件的内容, 并将其另存为创建的chapter的内容.
 
-        Args:
-            file_name (string): The file_name containing the html or xhtml
-                content of the created Chapter
+        Parameters:
+            file_name (string): 包含所创建chapter的html或xhtml内容的file_name.
             url (Option[string]): A url to infer the title of the chapter from
-            title (Option[string]): The title of the created Chapter. By
-                default, this is None, in which case the title will try to be
-                inferred from the webpage at the url.
+            title (Option[string]): chapter的章节名, 如果为None, 则使用从网页文件中获取的 title标签 的内容作为章节名.
 
         Returns:
-            Chapter: A chapter object whose content is the given file
-                and whose title is that provided or inferred from the url
+            Chapter: 一个Chapter对象, 其内容是给定html或xhtml文件的内容.
         """
         with codecs.open(file_name, 'r', encoding='utf-8') as f:
             content_string = f.read()
@@ -290,21 +289,16 @@ class ChapterFactory(object):
 
     def create_chapter_from_string(self, html_string, url=None, title=None):
         """
-        Creates a Chapter object from a string. Sanitizes the
-        string using the clean_function method, and saves
-        it as the content of the created chapter.
+        从字符串创建chapter对象.
+        使用clean_function方法清理字符串, 并将其另存为创建的chapter的内容.
 
-        Args:
-            html_string (string): The html or xhtml content of the created
-                Chapter
-            url (Option[string]): A url to infer the title of the chapter from
-            title (Option[string]): The title of the created Chapter. By
-                default, this is None, in which case the title will try to be
-                inferred from the webpage at the url.
+        Parameters:
+            html_string (string): 创建的chapter的html或xhtml内容.
+            url (Option[string]): 推断章节标题的url
+            title (Option[string]): chapter的章节名, 如果为None, 则使用从文本中获取的 title标签 的内容作为章节名.
 
         Returns:
-            Chapter: A chapter object whose content is the given string
-                and whose title is that provided or inferred from the url
+            Chapter: 一个Chapter对象, 其内容是给定文本的内容.
         """
         clean_html_string = self.clean_function(html_string)
         clean_xhtml_string = clean.html_to_xhtml(clean_html_string)
