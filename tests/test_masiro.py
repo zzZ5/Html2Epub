@@ -99,7 +99,9 @@ def saveEpub(infoList, bookName):
 
 
 if __name__ == "__main__":    # 主函数
-    URL = input("请输入要下载的网址: ")    # 获取地址
-    print("url为: " + URL + "\n开始下载...")
+    # URL = input("请输入要下载的网址: ")    # 获取地址
+    # print("url为: " + URL + "\n开始下载...")
+    URL = "https://masiro.moe/forum.php?mod=forumdisplay&fid=89"
+
     infoList, bookName = getInfoList(URL)
     saveEpub(infoList, bookName)
