@@ -1,14 +1,16 @@
 #!/usr/bin/python37
 # -*- coding : utf-8 -*-
-import requests
 import os
 import sys
 from urllib.parse import urlparse
 import re
-import pdfkit
+
+
 from bs4 import BeautifulSoup
-from epub import Epub
-from chapter import create_chapter_from_string
+import requests
+
+
+import html2epub
 
 DIR = "d:\\Users\\baoju\\Desktop\\books\\"
 
@@ -66,15 +68,15 @@ def getbook(url):    # 获取整本书并写入文本
 def saveEpub(url):
 
     bookName, htmls = getbook(url)
-    epub = Epub(bookName)
+    epub = html2epub.Epub(bookName)
     i = 0
     print("开始整合epub...")
     for eachHtml in htmls:
         i += 1
-        chapter = create_chapter_from_string(
+        chapter = html2epub.create_chapter_from_string(
             eachHtml, title="章节" + str(i))
         epub.add_chapter(chapter)
-        print("已整合{.2f}%".format(
+        print("已整合{:.2f}%".format(
             (htmls.index(eachHtml) + 1) / len(htmls) * 100))
     epub.create_epub(DIR)
     print("整合完毕.")
