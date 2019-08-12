@@ -6,6 +6,10 @@
 
 将 html链接, html文件 或 html文本 转换成 epub文件.
 
+>**tips**
+>
+>关于epub文件的格式可以参考 [EPUB - Wikipedia](https://en.wikipedia.org/wiki/EPUB).
+
 ## 快速使用
 
 ```python
@@ -18,4 +22,5 @@
 
 ## 参考文献
 
-1. *[wcember/pypub: Python library to programatically create epub files](https://github.com/wcember/pypub)*
+1. *[wcember/pypub: Python library to programatically create epub files](https://github.com/wcember/pypub).*
+2. *[EPUB - Wikipedia](https://en.wikipedia.org/wiki/EPUB).*
