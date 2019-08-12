@@ -12,7 +12,8 @@ from bs4 import BeautifulSoup
 
 import html2epub
 
-DIR = "d:\\Users\\baoju\\Desktop\\books\\"
+DIR = "d:\\Users\\baoju\\Desktop\\books\\"  # 输出epub文件的路径
+
 headers = {
     "cookie": "__cfduid=de9a30d2f3eb64f5a497759abab0a2ec91563444452; xxzo_2132_saltkey=mC8BccM9; xxzo_2132_lastvisit=1563440852; xxzo_2132_nofavfid=1; xxzo_2132_smile=1D1; xxzo_2132_auth=e72cRlanMgm5gv6bx13w6LSud1ubrWx6G%2BxKvJp1ZfIedrn9iFzLn7hMZ5LSCeSx7DgsyNhlmuCh5ujN8hyAUUxk; xxzo_2132_lastcheckfeed=9084%7C1565232143; xxzo_2132_sid=FmfHkM; xxzo_2132_lip=125.44.225.1%2C1565232676; xxzo_2132_onlineusernum=941; xxzo_2132_ulastactivity=d1d28Gd%2FJfBIoLE3E2WElQ6W7E75CaoRWHZ0%2FI9hG6MozwBraCZi; xxzo_2132_sendmail=1; xxzo_2132_checkpm=1; xxzo_2132_lastact=1565265308%09forum.php%09forumdisplay; xxzo_2132_st_t=9084%7C1565265308%7C097d78603fdb098dfd1144a026a61a76; xxzo_2132_forum_lastvisit=D_179_1565232434D_36_1565265292D_89_1565265308; xxzo_2132_visitedfid=89D36D179"
 }
