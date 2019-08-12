@@ -1,7 +1,7 @@
 #!usr/bin/python3
 # -*- coding: utf-8 -*-
 
-# import from python standard library
+# Included modules
 import os
 import shutil
 import collections
@@ -19,15 +19,18 @@ try:
 except ImportError:
     lxml_module_exists = False
 
-# import from other modules
+# Third party modules
 import jinja2
 
-# import from local modules
-import chapter
-import constants
+# Local modules
+from . import chapter
+from . import constants
 
 
 class _Mimetype():
+    """
+    Epub的 Mimetype文件 类, 写入固定内容的 minetype文件 到epub.
+    """
 
     def __init__(self, parent_directory):
         minetype_template = os.path.join(
@@ -37,6 +40,9 @@ class _Mimetype():
 
 
 class _ContainerFile():
+    """
+    Epub的 Container文件 类, 写入固定内容的 container.xml文件到 epub.
+    """
 
     def __init__(self, parent_directory):
         container_template = os.path.join(
@@ -47,7 +53,7 @@ class _ContainerFile():
 
 class _EpubFile():
     """
-    Class that used to write chapters to an epub.
+    用于将chapters写入Epub的类
     """
 
     def __init__(self, template_file, **non_chapter_parameters):
@@ -91,6 +97,9 @@ class _EpubFile():
 
 
 class TocHtml(_EpubFile):
+    """
+    Epub的 目录页面 类.
+    """
 
     def __init__(self, template_file=os.path.join(constants.EPUB_TEMPLATES_DIR, 'toc.html'), **non_chapter_parameters):
         super(TocHtml, self).__init__(template_file, **non_chapter_parameters)
@@ -118,6 +127,9 @@ class TocHtml(_EpubFile):
 
 
 class TocNcx(_EpubFile):
+    """
+    Epub的 XML的导航控制文件(toc.ncx) 类 
+    """
 
     def __init__(self,
                  template_file=os.path.join(
@@ -145,6 +157,9 @@ class TocNcx(_EpubFile):
 
 
 class ContentOpf(_EpubFile):
+    """
+    Epub的 .opf 类, 包含文件清单和文件阅读顺序等.
+    """
 
     def __init__(self, title, creator='', language='', rights='', publisher='', uid='', date=time.strftime("%m-%d-%Y")):
         super(ContentOpf, self).__init__(os.path.join(constants.EPUB_TEMPLATES_DIR, 'opf.xml'),
@@ -173,17 +188,14 @@ class ContentOpf(_EpubFile):
 
 class Epub():
     """
-    Class representing an epub. Add chapters to this and then output your ebook
-    as an epub file.
+    表示epub的类. 包含添加chapter和输出epub文件.
 
-    Args:
-        title (str): The title of the epub.
-        creator (Option[str]): The creator of your epub. By default this is
-            pypub.
-        language (Option[str]): The language of your epub.
-        rights (Option[str]): The rights of your epub.
-        publisher (Option[str]): The publisher of your epub. By default this
-            is pypub.
+    Parameters:
+        title (str): epub的标题.
+        creator (Option[str]): epub的作者.
+        language (Option[str]): epub的语言.
+        rights (Option[str]): epub的版权.
+        publisher (Option[str]): epub的出版商.
     """
 
     def __init__(self, title, creator='zzZ5', language='en', rights='', publisher='zzZ5', epub_dir=None):
@@ -210,6 +222,10 @@ class Epub():
         self.container = _ContainerFile(self.META_INF_DIR)
 
     def _create_directories(self, epub_dir=None):
+        """
+        创建epub文件目录.
+        """
+
         if epub_dir is None:
             self.EPUB_DIR = tempfile.mkdtemp()
         else:
@@ -223,6 +239,10 @@ class Epub():
         os.makedirs(self.IMAGE_DIR)
 
     def _increase_current_chapter_number(self):
+        """
+        增长当前章节序号.
+        """
+
         if self.current_chapter_number is None:
             self.current_chapter_number = 0
         else:
@@ -233,12 +253,12 @@ class Epub():
 
     def add_chapter(self, c):
         """
-        Add a Chapter to your epub.
-        Args:
-            c (Chapter): A Chapter object representing your chapter.
+        向epub中添加chapter. 创建各章节的xhtml文件.
+
+        Parameters:
+            c (Chapter): 要添加的chapter.
         Raises:
-            TypeError: Raised if a Chapter object isn't supplied to this
-                method.
+            TypeError: 如果添加的章节类型不对触发此 Error.
         """
         try:
             assert type(c) == chapter.Chapter
@@ -253,13 +273,18 @@ class Epub():
 
     def create_epub(self, output_directory, epub_name=None):
         """
-        Create an epub file from this object.
-        Args:
+        从该对象中创建epub文件.
+
+        Parameters:
             output_directory (str): Directory to output the epub file to
             epub_name (Option[str]): The file name of your epub. This should not contain
                 .epub at the end. If this argument is not provided, defaults to the title of the epub.
         """
         def createTOCs_and_ContentOPF():
+            """
+            创建目录和opf文件等.
+            """
+
             for epub_file, name in ((self.toc_html, 'toc.html'), (self.toc_ncx, 'toc.ncx'), (self.opf, 'content.opf'),):
                 epub_file.add_chapters(self.chapters)
                 epub_file.write(os.path.join(self.OEBPS_DIR, name))

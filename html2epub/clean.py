@@ -1,23 +1,23 @@
 #!usr/bin/python3
 # -*- coding: utf-8 -*-
 
-# import from python standard library
+# Included modules
 import re
 
-# import from other modules
+# Third party modules
 import bs4
 from bs4 import BeautifulSoup
 from bs4.dammit import EntitySubstitution
 
-# import from local modules
-import constants
+# Local modules
+from . import constants
 
 
 def create_html_from_fragment(tag):
     """
     Creates full html tree from a fragment. Assumes that tag should be wrapped in a body and is currently not
 
-    Args:
+    Parameters:
         tag: a bs4.element.Tag
 
     Returns:"
@@ -47,7 +47,7 @@ def clean(input_string,
     Attributes not contained as arguments in tag_dictionary are removed.
     Doctype is set to <!DOCTYPE html>.
 
-    Args:
+    Parameters:
         input_string (basestring): A (possibly unicode) string representing HTML.
         tag_dictionary (Option[dict]): A dictionary with tags as keys and
             attributes as values. This operates as a whitelist--i.e. if a tag
@@ -106,7 +106,7 @@ def condense(input_string):
     """
     Trims leadings and trailing whitespace between tags in an html document
 
-    Args:
+    Parameters:
         input_string: A (possible unicode) string representing HTML.
 
     Returns:
@@ -129,7 +129,7 @@ def html_to_xhtml(html_unicode_string):
     """
     Converts html to xhtml
 
-    Args:
+    Parameters:
         html_unicode_string: A (possible unicode) string representing HTML.
 
     Returns:
