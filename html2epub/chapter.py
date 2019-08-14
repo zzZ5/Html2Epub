@@ -222,6 +222,7 @@ class Chapter():
             imgInfo = _replace_image(
                 image_url, image_tag, ebook_folder)
             if imgInfo != None:
+                img_link, img_id, img_type = imgInfo
                 img = {'link': img_link, 'id': img_id, 'type': img_type}
                 self.imgs.append(img)
         unformatted_html_unicode_string = self._content_tree.prettify()
