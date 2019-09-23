@@ -12,7 +12,7 @@ import requests
 
 import html2epub
 
-DIR = "d:\\Users\\baoju\\Desktop\\books\\"  # 输出epub文件的路径
+DIR = "C:\\Users\\baoju\\Desktop\\"  # 输出epub文件的路径
 
 
 html_template = """
