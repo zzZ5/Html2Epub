@@ -86,5 +86,4 @@ if __name__ == "__main__":    # 主函数
     # URL = input("请输入要下载的网址: ")    # 获取地址
     # print("url为: " + URL + "\n开始下载...")
     URL = "https://www.lightnovel.cn/forum.php?mod=viewthread&tid=989498&page=1&authorid=1078151"
-
     saveEpub(URL)
