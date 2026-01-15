@@ -3,6 +3,7 @@
 
 import os
 
+# EPUB supported tags configuration / EPUB支持的标签配置
 SUPPORTED_TAGS = {
     'a': ['href', 'id', 'name'],
     'b': ['id'],

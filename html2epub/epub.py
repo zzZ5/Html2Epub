@@ -1,7 +1,7 @@
 #!usr/bin/python3
 # -*- coding: utf-8 -*-
 
-# Included modules
+# Included modules / 内置模块
 import os
 import shutil
 import collections
@@ -9,20 +9,21 @@ import random
 import string
 import time
 import tempfile
-import imp
 try:
-    imp.find_module('lxml')
-    lxml_module_exists = True
-    import lxml.etree
-    import lxml.html
-    import lxml.html.builder
-except ImportError:
+    import importlib.util
+    spec = importlib.util.find_spec('lxml')
+    lxml_module_exists = spec is not None
+    if lxml_module_exists:
+        import lxml.etree
+        import lxml.html
+        import lxml.html.builder
+except (ImportError, ModuleNotFoundError):
     lxml_module_exists = False
 
-# Third party modules
+# Third party modules / 第三方模块
 import jinja2
 
-# Local modules
+# Local modules / 本地模块
 from . import chapter
 from . import constants
 
@@ -30,6 +31,7 @@ from . import constants
 class _Mimetype():
     """
     Epub的 Mimetype文件 类, 写入固定内容的 minetype文件 到epub.
+    Epub Mimetype file class, writes fixed content mimetype file to epub.
     """
 
     def __init__(self, parent_directory):
@@ -42,6 +44,7 @@ class _Mimetype():
 class _ContainerFile():
     """
     Epub的 Container文件 类, 写入固定内容的 container.xml文件到 epub.
+    Epub Container file class, writes fixed content container.xml file to epub.
     """
 
     def __init__(self, parent_directory):
@@ -54,6 +57,7 @@ class _ContainerFile():
 class _EpubFile():
     """
     用于将chapters写入Epub的类
+    Class for writing chapters to Epub.
     """
 
     def __init__(self, template_file, **non_chapter_parameters):
@@ -99,6 +103,7 @@ class _EpubFile():
 class TocHtml(_EpubFile):
     """
     Epub的 目录页面 类.
+    Epub table of contents HTML page class.
     """
 
     def __init__(self, template_file=os.path.join(constants.EPUB_TEMPLATES_DIR, 'toc.html'), **non_chapter_parameters):
@@ -128,7 +133,8 @@ class TocHtml(_EpubFile):
 
 class TocNcx(_EpubFile):
     """
-    Epub的 XML的导航控制文件(toc.ncx) 类 
+    Epub的 XML的导航控制文件(toc.ncx) 类
+    Epub XML navigation control file (toc.ncx) class.
     """
 
     def __init__(self,
@@ -159,6 +165,7 @@ class TocNcx(_EpubFile):
 class ContentOpf(_EpubFile):
     """
     Epub的 .opf 类, 包含文件清单和文件阅读顺序等.
+    Epub .opf class, contains file manifest and reading order.
     """
 
     def __init__(self, title, creator='', language='', rights='', publisher='', uid='', date=time.strftime("%m-%d-%Y")):
@@ -189,13 +196,14 @@ class ContentOpf(_EpubFile):
 class Epub():
     """
     表示epub的类. 包含添加chapter和输出epub文件.
+    Class representing epub. Contains methods to add chapters and output epub file.
 
     Parameters:
-        title (str): epub的标题.
-        creator (Option[str]): epub的作者.
-        language (Option[str]): epub的语言.
-        rights (Option[str]): epub的版权.
-        publisher (Option[str]): epub的出版商.
+        title (str): epub的标题 / Title of the epub.
+        creator (Option[str]): epub的作者 / Author of the epub.
+        language (Option[str]): epub的语言 / Language of the epub.
+        rights (Option[str]): epub的版权 / Copyright of the epub.
+        publisher (Option[str]): epub的出版商 / Publisher of the epub.
     """
 
     def __init__(self, title, creator='zzZ5', language='en', rights='', publisher='zzZ5', epub_dir=None):
@@ -224,6 +232,7 @@ class Epub():
     def _create_directories(self, epub_dir=None):
         """
         创建epub文件目录.
+        Create epub file directory.
         """
 
         if epub_dir is None:
@@ -241,6 +250,7 @@ class Epub():
     def _increase_current_chapter_number(self):
         """
         增长当前章节序号.
+        Increment current chapter number.
         """
 
         if self.current_chapter_number is None:
@@ -254,11 +264,12 @@ class Epub():
     def add_chapter(self, c):
         """
         向epub中添加chapter. 创建各章节的xhtml文件.
+        Add chapter to epub. Creates xhtml files for each chapter.
 
         Parameters:
-            c (Chapter): 要添加的chapter.
+            c (Chapter): 要添加的chapter / Chapter to be added.
         Raises:
-            TypeError: 如果添加的章节类型不对触发此 Error.
+            TypeError: 如果添加的章节类型不对触发此 Error / Raised if the chapter type is incorrect.
         """
         try:
             assert type(c) == chapter.Chapter
@@ -274,15 +285,18 @@ class Epub():
     def create_epub(self, output_directory, epub_name=None):
         """
         从该对象中创建epub文件.
+        Create epub file from this object.
 
         Parameters:
-            output_directory (str): Directory to output the epub file to
+            output_directory (str): Directory to output the epub file to / 输出epub文件的目录.
             epub_name (Option[str]): The file name of your epub. This should not contain
                 .epub at the end. If this argument is not provided, defaults to the title of the epub.
+                epub文件名. 不应包含.epub后缀. 如果未提供, 默认使用epub标题.
         """
         def createTOCs_and_ContentOPF():
             """
             创建目录和opf文件等.
+            Create table of contents and opf files.
             """
 
             for epub_file, name in ((self.toc_html, 'toc.html'), (self.toc_ncx, 'toc.ncx'), (self.opf, 'content.opf'),):
