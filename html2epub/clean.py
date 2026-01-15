@@ -1,4 +1,4 @@
-#!usr/bin/python3
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 # Included modules / 内置模块
@@ -7,7 +7,7 @@ import re
 # Third party modules / 第三方模块
 import bs4
 from bs4 import BeautifulSoup
-from bs4.dammit import EntitySubstitution
+
 
 # Local modules / 本地模块
 from . import constants

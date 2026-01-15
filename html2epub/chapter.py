@@ -1,4 +1,4 @@
-#!usr/bin/python3
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 # Included modules / 内置模块
@@ -261,7 +261,7 @@ class Chapter():
         for image_tag, image_url in image_url_list:
             imgInfo = _replace_image(
                 image_url, image_tag, ebook_folder)
-            if imgInfo != None:
+            if imgInfo is not None:
                 img_link, img_id, img_type = imgInfo
                 img = {'link': img_link, 'id': img_id, 'type': img_type}
                 self.imgs.append(img)

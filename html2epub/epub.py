@@ -1,4 +1,4 @@
-#!usr/bin/python3
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 # Included modules / 内置模块
@@ -115,7 +115,7 @@ class TocHtml(_EpubFile):
         try:
             for c in chapter_list:
                 t = type(c)
-                assert type(c) == chapter.Chapter
+                assert isinstance(c, chapter.Chapter)
         except AssertionError:
             raise TypeError('chapter_list items must be Chapter not %s',
                             str(t))
@@ -272,7 +272,7 @@ class Epub():
             TypeError: 如果添加的章节类型不对触发此 Error / Raised if the chapter type is incorrect.
         """
         try:
-            assert type(c) == chapter.Chapter
+            assert isinstance(c, chapter.Chapter)
         except AssertionError:
             raise TypeError('chapter must be of type Chapter')
         chapter_file_output = os.path.join(
